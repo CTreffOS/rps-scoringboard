@@ -21,6 +21,6 @@ I setted it up in a Raspberry Pi. And these are the steps need to be done after 
 	git config --global user.email "you@example.com"
 	git config --global user.name "Your Name"
 	git clone https://github.com/CTreffOS/rps-scoringboard.git
-	cp github/ctreffos/rps-scoringboard/* /var/www
+	sudo cp /home/ctreffos/github/ctreffos/rps-scoringboard/* /var/www
 	
 After this setup the leaderboard should be available.
