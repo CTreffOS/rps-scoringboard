@@ -72,10 +72,11 @@
             <h2>Highscore<h2>
           </div>
           <div class="row" id="statRow">
-            <table id="my-table" class="table table-bordered">
+            <table id="highscoreTable" class="table table-bordered">
               <thead>
-                <th data-dynatable-column="band" class="dynatable-head">Band</th>
-                <th data-dynatable-column="song" class="dynatable-head">Song</th>
+                <th data-dynatable-column="code" class="dynatable-head">Code</th>
+                <th data-dynatable-column="name" class="dynatable-head">Name</th>
+                <th data-dynatable-column="won" class="dynatable-head">Won</th>
               </thead>
               <tbody>
               </tbody>
@@ -86,202 +87,52 @@
   </body>
   <footer>
     <script type="text/javascript">
+      function setHighscore(json){
+        console.log(JSON.stringify(json));
+        $('#highscoreTable').dynatable({
+          dataset: {
+            highscore: json
+          }
+        });
+      }
+      
       $( document ).ready(function() {
+        initCharts();
         /* The real Deal */
         hostname = window.location.hostname;
         if(hostname=='localhost'){
           hostname = 'raziel.virtuos.uos.de';
         }
+        
+        /* Last Game & Stats */
         lastgameURL = 'http://'+hostname+':5000/lastgame';
-        console.log(lastgameURL);
-        
-        /* JSONP-Modul von https://github.com/jaubourg/jquery-jsonp */
-        $.jsonp({
-          url: lastgameURL,
-          success: function(json){console.log('success');console.log(json);},
-          error: function(e){console.log('error'); console.log(e);}
-        });
-        
-        /* JQUERY Build-In*/
         $.ajax({
           url: lastgameURL,
-          dataType: "jsonp",
-          success: function(json){console.log('success');console.log(json);},
-          error: function(e){console.log('error');console.log(e);}
+          async: false,
+          dataType: 'jsonp',
+          jsonp : false,
+          jsonpCallback: 'lastgame',
+          contentType: 'application/json',
+          success: function(json) {setWinGraphs(json); setStatGraphs(json);},
+          error: function(e) { console.log('error'); }
         });
         
-        /* Pure Javascript */
-        var jsonp = {
-          callbackCounter: 0,
-            fetch: function(url, callback) {
-              var fn = 'JSONPCallback_' + this.callbackCounter++;
-              window[fn] = this.evalJSONP(callback);
-              url = url.replace('=JSONPCallback', '=' + fn);
-              var scriptTag = document.createElement('SCRIPT');
-              scriptTag.src = url;
-              document.getElementsByTagName('HEAD')[0].appendChild(scriptTag);
-          },
-          evalJSONP: function(callback) {
-            return function(data) {
-              var validJSON = false;
-              if (typeof data == "string") {
-                try {validJSON = JSON.parse(data);} catch (e) {
-                /*invalid JSON*/}
-              } else {
-                validJSON = JSON.parse(JSON.stringify(data));
-                window.console && console.warn('response data was not a JSON string');
-              }
-              if (validJSON) {
-                callback(validJSON);
-              } else {
-                throw("JSONP call returned invalid or empty JSON");
-              }
-            }
-          }
-        };
-        jsonp.fetch(lastgameURL, function(data) {console.log(data[0].text)});
-        
-        
-        
+        /* Highscore Table */
+        highscoreURL = 'http://'+hostname+':5000/highscore'
+        $.ajax({
+          url: highscoreURL,
+          async: false,
+          dataType: 'jsonp',
+          jsonp : false,
+          jsonpCallback: 'highscore',
+          contentType: 'application/json',
+          success: function(json) {setHighscore(json);},
+          error: function(e) { console.log('error'); }
+        });
         
         /* Dummy Stuff for Displaying nice Charts */
-        initCharts();
-        $('#my-table').dynatable();
-              records = '[{"band": "Weezer","song": "El Scorcho"},{"band": "Chevelle","song": "Family System"}]',
-        myRecords = JSON.parse(records);
-        $('#my-table').dynatable({
-          dataset: {
-            records: myRecords
-          }
-        });
-        //
-        //for the left chart
-        // Get context with jQuery - using jQuery's .get() method.
-        var ctxWinLeft = $("#leftWinChart").get(0).getContext("2d");
-        // This will get the first returned node in the jQuery collection.
-        var charWintLeft = new Chart(ctxWinLeft);
-        //for the right chart
-        var ctxWinRight = $("#rightWinChart").get(0).getContext("2d");
-        var charWintRight = new Chart(ctxWinRight);
         
-        var ctxStatLeft = $("#leftStatChart").get(0).getContext("2d");
-        var charStatLeft = new Chart(ctxStatLeft);
         
-        var ctxStatRight = $("#rightStatChart").get(0).getContext("2d");
-        var charStatRight = new Chart(ctxStatRight);
-        
-        var data1 = {
-          labels: ["Wins"],
-          datasets: [
-            {
-              label: "Percent",
-              fillColor: "rgba(220,220,220,0.2)",
-              strokeColor: "rgba(220,220,220,1)",
-              pointColor: "rgba(220,220,220,1)",
-              pointStrokeColor: "#fff",
-              pointHighlightFill: "#fff",
-              pointHighlightStroke: "rgba(220,220,220,1)",
-              data: [60]
-            },
-          ]
-        };
-        var data2 = {
-          labels: ["Wins"],
-          datasets: [
-            {
-              label: "Percent",
-              fillColor: "rgba(220,220,220,0.2)",
-              strokeColor: "rgba(220,220,220,1)",
-              pointColor: "rgba(220,220,220,1)",
-              pointStrokeColor: "#fff",
-              pointHighlightFill: "#fff",
-              pointHighlightStroke: "rgba(220,220,220,1)",
-              data: [40]
-            },
-          ]
-        };
-        var data3 = [
-          {
-            value: 300,
-            color:"#F7464A",
-            highlight: "#FF5A5E",
-            label: "Red"
-          },
-          {
-            value: 50,
-            color: "#46BFBD",
-            highlight: "#5AD3D1",
-            label: "Green"
-          },
-          {
-            value: 100,
-            color: "#FDB45C",
-            highlight: "#FFC870",
-            label: "Yellow"
-          }
-        ];
-        var data4 = [
-          {
-            value: 300,
-            color:"#F7464A",
-            highlight: "#FF5A5E",
-            label: "Red"
-          },
-          {
-            value: 50,
-            color: "#46BFBD",
-            highlight: "#5AD3D1",
-            label: "Green"
-          },
-          {
-            value: 100,
-            color: "#FDB45C",
-            highlight: "#FFC870",
-            label: "Yellow"
-          }
-          ];
-        var options = {
-          //Boolean - Whether grid lines are shown across the chart
-          scaleShowGridLines : true,
-          //String - Colour of the grid lines
-          scaleGridLineColor : "rgba(0,0,0,.05)",
-          // Boolean - If we want to override with a hard coded scale
-          scaleOverride: true,
-          // ** Required if scaleOverride is true **
-          // Number - The number of steps in a hard coded scale
-          scaleSteps: 10,
-          // Number - The value jump in the hard coded scale
-          scaleStepWidth: 10,
-          // Number - The scale starting value
-          scaleStartValue: 0,
-          // Number - The scale ending value
-          sclaeEndValue:100,
-          //Number - Width of the grid lines
-          scaleGridLineWidth : 1,
-          //Boolean - Whether the line is curved between points
-          bezierCurve : true,
-          //Number - Tension of the bezier curve between points
-          bezierCurveTension : 0.4,
-          //Boolean - Whether to show a dot for each point
-          pointDot : true,
-          //Number - Radius of each point dot in pixels
-          pointDotRadius : 4,
-          //Number - Pixel width of point dot stroke
-          pointDotStrokeWidth : 1,
-          //Number - amount extra to add to the radius to cater for hit detection
-          //outside the drawn point
-          pointHitDetectionRadius : 20,
-          //Boolean - Whether to show a stroke for datasets
-          datasetStroke : true,
-          //Number - Pixel width of dataset stroke
-          datasetStrokeWidth : 2,
-          //Boolean - Whether to fill the dataset with a colour
-          datasetFill : true,
-        };
-        new Chart(ctxWinLeft).Bar(data1, options);
-        new Chart(ctxWinRight).Bar(data2, options);
-        new Chart(ctxStatLeft).Pie(data3,options);
-        new Chart(ctxStatRight).Pie(data4,options);
       });
     </script>
   </footer>

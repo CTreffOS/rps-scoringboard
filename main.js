@@ -87,3 +87,141 @@ function initCharts() {
       onAnimationComplete: function(){}
 	}
 }
+function setWinGraphs(json, options){
+  var options = {
+    //Boolean - Whether grid lines are shown across the chart
+    scaleShowGridLines : true,
+    //String - Colour of the grid lines
+    scaleGridLineColor : "rgba(0,0,0,.05)",
+    // Boolean - If we want to override with a hard coded scale
+    scaleOverride: true,
+    // ** Required if scaleOverride is true **
+    // Number - The number of steps in a hard coded scale
+    scaleSteps: 10,
+    // Number - The value jump in the hard coded scale
+    scaleStepWidth: 100,
+    // Number - The scale starting value
+    scaleStartValue: 0,
+    // Number - The scale ending value
+    sclaeEndValue:1000,
+    //Number - Width of the grid lines
+    scaleGridLineWidth : 1,
+    //Boolean - Whether the line is curved between points
+    bezierCurve : true,
+    //Number - Tension of the bezier curve between points
+    bezierCurveTension : 0.4,
+    //Boolean - Whether to show a dot for each point
+    pointDot : true,
+    //Number - Radius of each point dot in pixels
+    pointDotRadius : 4,
+    //Number - Pixel width of point dot stroke
+    pointDotStrokeWidth : 1,
+    //Number - amount extra to add to the radius to cater for hit detection
+    //outside the drawn point
+    pointHitDetectionRadius : 20,
+    //Boolean - Whether to show a stroke for datasets
+    datasetStroke : true,
+    //Number - Pixel width of dataset stroke
+    datasetStrokeWidth : 2,
+    //Boolean - Whether to fill the dataset with a colour
+    datasetFill : true,
+  };
+  var dataLeft = {
+    labels: ["Wins"],
+    datasets: [
+    {
+      label: "Percent",
+      fillColor: "rgba(220,220,220,0.2)",
+      strokeColor: "rgba(220,220,220,1)",
+      pointColor: "rgba(220,220,220,1)",
+      pointStrokeColor: "#fff",
+      pointHighlightFill: "#fff",
+      pointHighlightStroke: "rgba(220,220,220,1)",
+      data: [json.won_1]
+    },
+  ]};
+  var dataRight = {
+    labels: ["Wins"],
+    datasets: [
+    {
+      label: "Percent",
+      fillColor: "rgba(220,220,220,0.2)",
+      strokeColor: "rgba(220,220,220,1)",
+      pointColor: "rgba(220,220,220,1)",
+      pointStrokeColor: "#fff",
+      pointHighlightFill: "#fff",
+      pointHighlightStroke: "rgba(220,220,220,1)",
+      data: [json.won_2]
+    },
+  ]};
+  var ctxWinLeft = $("#leftWinChart").get(0).getContext("2d");
+  var charWintLeft = new Chart(ctxWinLeft);
+
+  var ctxWinRight = $("#rightWinChart").get(0).getContext("2d");
+  var charWintRight = new Chart(ctxWinRight);
+  
+  new Chart(ctxWinLeft).Bar(dataLeft, options);
+  new Chart(ctxWinRight).Bar(dataRight, options);      
+}
+
+function setStatGraphs(json){
+  var options = {
+    //Number - Amount of animation steps
+    animationSteps : 100,
+    //String - Animation easing effect
+    animationEasing : "easeOutBounce",
+    //Boolean - Whether we animate the rotation of the Doughnut
+    animateRotate : true,
+    //Boolean - Whether we animate scaling the Doughnut from the centre
+    animateScale : false
+  };
+  var dataLeft = [
+    {
+      value: json.rock_1,
+      color:"#F7464A",
+      highlight: "#FF5A5E",
+      label: "Rock"
+    },
+    {
+      value: json.paper_1,
+      color: "#46BFBD",
+      highlight: "#5AD3D1",
+      label: "Paper"
+    },
+    {
+      value: json.scissors_1,
+      color: "#FDB45C",
+      highlight: "#FFC870",
+      label: "Scissor"
+    }
+  ];
+  var dataRight = [
+    {
+      value: json.rock_2,
+      color:"#F7464A",
+      highlight: "#FF5A5E",
+      label: "Rock"
+    },
+    {
+      value: json.paper_2,
+      color: "#46BFBD",
+      highlight: "#5AD3D1",
+      label: "Paper"
+    },
+    {
+      value: json.scissors_2,
+      color: "#FDB45C",
+      highlight: "#FFC870",
+      label: "Scissor"
+    }
+  ];
+  
+  var ctxStatLeft = $("#leftStatChart").get(0).getContext("2d");
+  var charStatLeft = new Chart(ctxStatLeft);
+
+  var ctxStatRight = $("#rightStatChart").get(0).getContext("2d");
+  var charStatRight = new Chart(ctxStatRight);
+  
+  new Chart(ctxStatLeft).Pie(dataLeft,options);
+  new Chart(ctxStatRight).Pie(dataRight,options);
+}
