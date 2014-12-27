@@ -6,7 +6,6 @@
     <script src="main.js"></script>
     <script src="bootstrap.min.js"></script>
     <script src="jquery.dynatable.js"></script>
-    <script src="jquery.jsonp-2.4.0.min.js"></script>
     <link href="bootstrap.min.css" rel="stylesheet">
     <link href="bootstrap-theme.min.css" rel="stylesheet">
     <link href="jquery.dynatable.css" rel="stylesheet">
@@ -73,14 +72,12 @@
           </div>
           <div class="row" id="statRow">
             <table id="highscoreTable" class="table table-bordered">
-              <thead>
-                <th data-dynatable-column="code" class="dynatable-head">Code</th>
-                <th data-dynatable-column="name" class="dynatable-head">Name</th>
-                <th data-dynatable-column="won" class="dynatable-head">Won</th>
-              </thead>
-              <tbody>
-              </tbody>
-          </table>
+	      <th data-dynatable-column="score">Score</th>
+	      <th data-dynatable-column="won">Won</th>
+	      <th data-dynatable-column="name">Name</th>
+	      <th data-dynatable-colimn="code">Code</th>
+	      <tbody></tbody>
+            </table>
           </div>
       </div>
     </div>
@@ -90,19 +87,34 @@
       function setHighscore(json){
         console.log(JSON.stringify(json));
         $('#highscoreTable').dynatable({
-          dataset: {
-            highscore: json
-          }
+	  table: {
+    	    defaultColumnIdStyle: 'camelCase',
+    	    columns: null,
+    	    headRowSelector: 'tr:first-child', // or e.g. tr:first-child
+    	    bodyRowSelector: 'tbody tr',
+    	    headRowClass: null
+  	  },
+	  features: {
+	    sort: true,
+    	    paginate: false,
+            search: false,
+    	    recordCount: false,
+            perPageSelect: false
+          },
+	  dataset : {
+	    records: JSON.parse(JSON.stringify(json))
+	  }
         });
       }
       
       $( document ).ready(function() {
-        initCharts();
+        /* $('#highscoreTable').dynatable(); */
+	initCharts();
         /* The real Deal */
-        hostname = window.location.hostname;
-        if(hostname=='localhost'){
+        hostname = '151.217.63.97';
+        /* if(hostname=='localhost'){
           hostname = 'raziel.virtuos.uos.de';
-        }
+        }/*
         
         /* Last Game & Stats */
         lastgameURL = 'http://'+hostname+':5000/lastgame';
@@ -127,7 +139,7 @@
           jsonpCallback: 'highscore',
           contentType: 'application/json',
           success: function(json) {setHighscore(json);},
-          error: function(e) { console.log('error'); }
+          error: function(e) {console.log('error in Highscore'); console.log('error'); }
         });
         
         /* Dummy Stuff for Displaying nice Charts */
