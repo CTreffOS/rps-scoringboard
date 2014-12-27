@@ -126,6 +126,16 @@ function setWinGraphs(json, options){
     //Boolean - Whether to fill the dataset with a colour
     datasetFill : true,
   };
+  $('#leftChartName').text(json.name_1);
+  $('#rightChartName').text(json.name_2);
+  $('#leftStatName').text(json.name_1);
+  $('#rightStatName').text(json.name_2);
+  if(json.won_1 > json.won_2){
+    $('#header-lead').text(json.name_1);
+  }
+  else{
+    $('#header-lead').text(json.name_2);
+  }
   var dataLeft = {
     labels: ["Wins"],
     datasets: [
